@@ -1,4 +1,4 @@
-import { MOVE_DELAY_MS, GRID_SIZE } from './const'
+import { MOVE_DELAY_MS, GRID_SIZE, FOUND_GOAL_MESSAGE_MS } from './const'
 import { draw, drawFound } from './draw'
 import { exitHandler, wait } from './util'
 import BayesianSearch from './bayesianSearch'
@@ -15,13 +15,13 @@ async function start() {
 
   while (true) {
     draw(ctx)
-    await wait(MOVE_DELAY_MS)
+    MOVE_DELAY_MS > 0 && (await wait(MOVE_DELAY_MS))
 
     const goalFound = ctx.check(ctx.position)
 
     if (goalFound) {
       drawFound(ctx)
-      await wait(500)
+      FOUND_GOAL_MESSAGE_MS > 0 && (await wait(FOUND_GOAL_MESSAGE_MS))
       ctx = BayesianSearch.createInitial({ x: GRID_SIZE, y: GRID_SIZE })
       continue
     }
@@ -38,7 +38,7 @@ async function start() {
       best.probability > curr.probability ? best : curr
     )
 
-    if (ctx.best.probability / bestAdjacent.probability > 2) {
+    if (ctx.best.probability / bestAdjacent.probability > 1.5) {
       ctx.position = Vec.nextPoint(ctx.position, ctx.best)
     } else {
       ctx.position = bestAdjacent

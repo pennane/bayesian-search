@@ -43,4 +43,9 @@ export const INITIAL_PROBABILITY_DISTRIBUTION_X0 = 4
 /**
  * The number of milliseconds waited between each move in the context.
  */
-export const MOVE_DELAY_MS = 25
+export const MOVE_DELAY_MS = 30
+
+/**
+ * How long the "Found it" message is shown
+ */
+export const FOUND_GOAL_MESSAGE_MS = 750
