@@ -1,4 +1,4 @@
-import { ADJACENT_DELTAS } from './const'
+import { ADJACENT_OFFSETS } from './const'
 import { Cell, Vector, Grid } from './types'
 
 function at(grid: Grid, point: Vector) {
@@ -8,9 +8,9 @@ function at(grid: Grid, point: Vector) {
 function adjacents(grid: Grid, point: Vector) {
   const adjacents: (Cell & Vector)[] = []
 
-  for (const dir of ADJACENT_DELTAS) {
-    const newX = point.x + dir.x
-    const newY = point.y + dir.y
+  for (const offset of ADJACENT_OFFSETS) {
+    const newX = point.x + offset.x
+    const newY = point.y + offset.y
 
     if (newX >= 0 && newX < grid[0].length && newY >= 0 && newY < grid.length) {
       adjacents.push(at(grid, { x: newX, y: newY }))

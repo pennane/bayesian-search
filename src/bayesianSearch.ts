@@ -1,8 +1,8 @@
 import {
-  INITIAL_EXPECTATION_RANGE_DIVIDER,
-  INITIAL_EXPECTATION_WEIGHT,
-  PROBABILITY_TO_FIND,
-  SIZE
+  INITIAL_EXPECTATION_RANGE_FACTOR,
+  INITIAL_EXPECTATION_DISPERSION,
+  GOAL_FIND_PROBABILITY,
+  GRID_SIZE
 } from './const'
 import { Cell, SearchCell, Vector } from './types'
 import Grid from './grid'
@@ -93,7 +93,7 @@ namespace BayesianSearch {
     }
 
     const expectationRange = Math.round(
-      SIZE / INITIAL_EXPECTATION_RANGE_DIVIDER
+      GRID_SIZE / INITIAL_EXPECTATION_RANGE_FACTOR
     )
 
     const expectedActual = {
@@ -109,7 +109,7 @@ namespace BayesianSearch {
       Array.from({ length: cols }, () => ({
         probability: 0,
         visitations: 0,
-        probabilityToFind: PROBABILITY_TO_FIND,
+        probabilityToFind: GOAL_FIND_PROBABILITY,
         isGoal: false
       }))
     )
@@ -122,7 +122,7 @@ namespace BayesianSearch {
           Math.abs(y - expectedActual.y) + Math.abs(x - expectedActual.x)
 
         const probability =
-          1_000_000 / Math.exp(INITIAL_EXPECTATION_WEIGHT * (distance + 1))
+          1_000_000 / Math.exp(INITIAL_EXPECTATION_DISPERSION * (distance + 1))
 
         grid[y][x].probability = probability
         totalProbability += probability

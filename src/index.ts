@@ -1,4 +1,4 @@
-import { FRAME_MS, SIZE } from './const'
+import { MOVE_DELAY_MS, GRID_SIZE } from './const'
 import { draw, drawFound } from './draw'
 import { exitHandler, wait } from './util'
 import BayesianSearch from './bayesianSearch'
@@ -11,17 +11,18 @@ process.on('SIGINT', exitHandler.bind(null, { exit: true }))
 async function start() {
   console.clear()
 
-  let ctx = BayesianSearch.createInitial({ x: SIZE, y: SIZE })
+  let ctx = BayesianSearch.createInitial({ x: GRID_SIZE, y: GRID_SIZE })
 
   while (true) {
     draw(ctx)
-    await wait(FRAME_MS)
-    const found = ctx.check(ctx.position)
+    await wait(MOVE_DELAY_MS)
 
-    if (found) {
+    const goalFound = ctx.check(ctx.position)
+
+    if (goalFound) {
       drawFound(ctx)
       await wait(500)
-      ctx = BayesianSearch.createInitial({ x: SIZE, y: SIZE })
+      ctx = BayesianSearch.createInitial({ x: GRID_SIZE, y: GRID_SIZE })
       continue
     }
 
