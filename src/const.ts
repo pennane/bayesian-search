@@ -17,14 +17,14 @@ export const GRID_SIZE = 24
 /**
  * The probability of finding the goal when checking a cell that contains the goal.
  */
-export const GOAL_FIND_PROBABILITY = 0.65
+export const GOAL_FIND_PROBABILITY = 0.5
 
 /**
  * Determines the initial expectation range relative to the actual goal.
  * higher -> more correct expectation
  * lower  -> more faulty expectation
  */
-export const INITIAL_EXPECTATION_RANGE_FACTOR = 3
+export const INITIAL_EXPECTATION_RANGE_FACTOR = 2
 
 /**
  * How steeply the probabilities transition towards 0
