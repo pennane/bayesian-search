@@ -83,11 +83,6 @@ namespace BayesianSearch {
     const rows = size.x
     const cols = size.y
 
-    const startingPosition = {
-      x: Grid.positionNearEdge(rows),
-      y: Grid.positionNearEdge(cols)
-    }
-
     const actual = {
       x: Grid.positionNearCentre(rows),
       y: Grid.positionNearCentre(rows)
@@ -105,6 +100,8 @@ namespace BayesianSearch {
         actual.y + (expectationRange * Math.random() - 0.5 * expectationRange)
       )
     }
+
+    const startingPosition = Vec.pointAsFarAsPossible(size, expectedActual)
 
     const grid: Cell[][] = Array.from({ length: rows }, () =>
       Array.from({ length: cols }, () => ({
