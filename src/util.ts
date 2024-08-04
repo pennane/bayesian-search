@@ -14,11 +14,12 @@ export function sample<T>(arr: T[]): T {
 export const PROBABILITY_CEIL_COLORS: [number, TextSetting[]][] = [
   [0.00001, ['hidden', 'bgBlack']],
   [0.0001, ['gray', 'bgBlack']],
-  [0.001, ['green', 'bgBlack']],
-  [0.005, ['greenBright', 'bgBlack']],
-  [0.01, ['yellow', 'bgBlack']],
-  [0.05, ['yellowBright', 'bgBlack', 'bold']],
-  [0.1, ['redBright', 'bgBlack']],
+  [0.001, ['gray', 'bgBlack', 'bold']],
+  [0.005, ['green', 'bgBlack']],
+  [0.01, ['greenBright', 'bgBlack', 'bold']],
+  [0.05, ['yellow', 'bgBlack']],
+  [0.1, ['yellowBright', 'bgBlack', 'bold']],
+  [0.5, ['redBright', 'bgBlack']],
   [1, ['redBright', 'bgRed', 'bold']]
 ]
 

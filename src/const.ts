@@ -21,17 +21,24 @@ export const GOAL_FIND_PROBABILITY = 0.6
 
 /**
  * Determines the initial expectation range relative to the actual goal.
- * A smaller number means the initial expectation is farther from the actual goal,
- * while a number closer to GRID_SIZE means the initial expectation is closer to the actual goal.
+ * higher -> more correct expectation
+ * lower  -> more faulty expectation
  */
-export const INITIAL_EXPECTATION_RANGE_FACTOR = 4
+export const INITIAL_EXPECTATION_RANGE_FACTOR = 3
 
 /**
- * Determines the dispersion of the initial expectation.
- * A smaller weight means a larger expectation area,
- * while a larger weight means a smaller expectation area.
+ * How steeply the probabilities transition towards 0
+ * higher -> more steep (higher trust in expectation)
+ * lower  -> more gradual (lower trust in expectatin)
  */
-export const INITIAL_EXPECTATION_DISPERSION = 0.8
+export const INITIAL_PROBABILITY_DISTRIBITION_K = 2
+
+/**
+ * The midpoint of the distribution
+ * higher  -> cutoff happens slower (more vague expectation)
+ * smaller -> cutoff happens faster (more exact expectation)
+ */
+export const INITIAL_PROBABILITY_DISTRIBUTION_X0 = 4
 
 /**
  * The number of milliseconds waited between each move in the context.
