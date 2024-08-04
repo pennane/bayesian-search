@@ -1,61 +1,46 @@
-import { createInitialContext } from './context'
 import { FRAME_MS, SIZE } from './const'
 import { draw, drawFound } from './draw'
-import { pointEquals, wait, nextPoint, exitHandler } from './util'
+import { exitHandler, wait } from './util'
+import Context from './context'
+import Vec from './vec'
+import Grid from './grid'
 
 process.on('exit', exitHandler.bind(null, { cleanup: true }))
 process.on('SIGINT', exitHandler.bind(null, { exit: true }))
 
 async function start() {
-  let ctx = createInitialContext({ x: SIZE, y: SIZE })
-  let best = ctx.grid
-    .flat()
-    .reduce((best, curr) => (best.probability > curr.probability ? best : curr))
-
   console.clear()
+
+  let ctx = Context.createInitial({ x: SIZE, y: SIZE })
 
   while (true) {
     draw(ctx)
     await wait(FRAME_MS)
-    const found = ctx.check(ctx.currentPosition)
+    const found = ctx.check(ctx.position)
 
     if (found) {
       drawFound(ctx)
       await wait(500)
-      ctx = createInitialContext({ x: SIZE, y: SIZE })
-      best = ctx.grid
-        .flat()
-        .reduce((best, curr) =>
-          best.probability > curr.probability ? best : curr
-        )
-
+      ctx = Context.createInitial({ x: SIZE, y: SIZE })
       continue
     }
 
-    const newAdjacents = ctx.adjacents(ctx.currentPosition)
+    const adjacents = Grid.adjacents(ctx.grid, ctx.position)
 
-    best = pointEquals(ctx.currentPosition, best)
-      ? ctx.grid
-          .flat()
-          .reduce((best, curr) =>
-            best.probability > curr.probability ? best : curr
-          )
-      : best
-
-    if (newAdjacents.length === 0) {
-      const next = nextPoint(ctx.currentPosition, best)
-      ctx.currentPosition = next
+    if (adjacents.length === 0) {
+      const next = Vec.nextPoint(ctx.position, ctx.best)
+      ctx.position = next
       continue
     }
 
-    const bestAdjacent = newAdjacents.reduce((best, curr) =>
+    const bestAdjacent = adjacents.reduce((best, curr) =>
       best.probability > curr.probability ? best : curr
     )
 
-    if (best.probability / bestAdjacent.probability > 2) {
-      ctx.currentPosition = nextPoint(ctx.currentPosition, best)
+    if (ctx.best.probability / bestAdjacent.probability > 2) {
+      ctx.position = Vec.nextPoint(ctx.position, ctx.best)
     } else {
-      ctx.currentPosition = bestAdjacent
+      ctx.position = bestAdjacent
     }
   }
 }

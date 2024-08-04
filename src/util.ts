@@ -1,5 +1,5 @@
 import { showCursor } from './draw'
-import type { Vec, TextSetting } from './types'
+import type { TextSetting } from './types'
 
 export async function wait(ms: number) {
   return new Promise((resolve) => {
@@ -9,21 +9,6 @@ export async function wait(ms: number) {
 
 export function sample<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
-}
-
-export function pointEquals(a: Vec, b: Vec) {
-  return a.x === b.x && a.y === b.y
-}
-
-export function nextPoint(from: Vec, to: Vec): Vec {
-  const dx = to.x - from.x
-  const dy = to.y - from.y
-
-  if (Math.abs(dx) > Math.abs(dy)) {
-    return { x: from.x + Math.sign(dx), y: from.y }
-  } else {
-    return { x: from.x, y: from.y + Math.sign(dy) }
-  }
 }
 
 export const PROBABILITY_CEIL_COLORS: [number, TextSetting[]][] = [

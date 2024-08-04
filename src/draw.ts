@@ -1,14 +1,13 @@
 import { styleText } from 'node:util'
+import Grid from './grid'
+import Vec from './vec'
+import Context from './context'
+import { probabilityColor, PROBABILITY_CEIL_COLORS } from './util'
 
-import { probabilityColor, pointEquals, PROBABILITY_CEIL_COLORS } from './util'
-import { Context } from './context'
-
-// Helper function to move cursor to a specific position
 function moveTo(x: number, y: number): string {
   return `\x1b[${y + 1};${x + 1}H`
 }
 
-// Function to hide the cursor
 function hideCursor(): string {
   return '\x1b[?25l'
 }
@@ -17,7 +16,7 @@ export function showCursor(): string {
   return '\x1b[?25h'
 }
 
-export function draw(ctx: Context) {
+export function draw(ctx: Context.BayesianSearch) {
   process.stdout.write(hideCursor())
 
   process.stdout.write(moveTo(2, 0))
@@ -34,9 +33,9 @@ export function draw(ctx: Context) {
         styleText(
           [
             ...probabilityColor(cell.probability),
-            ...(pointEquals({ x, y }, ctx.actualGoal)
+            ...(Grid.at(ctx.grid, { x, y }).isGoal
               ? ['bgMagenta' as const]
-              : pointEquals({ x, y }, ctx.currentPosition)
+              : Vec.equals({ x, y }, ctx.position)
               ? ['bgWhite' as const]
               : [])
           ],
@@ -60,14 +59,13 @@ export function draw(ctx: Context) {
   process.stdout.write(hideCursor())
 }
 
-export function drawFound(ctx: Context) {
+export function drawFound(ctx: Context.BayesianSearch) {
   const text = styleText(['redBright', 'bgBlack'], 'Found it!')
   const width = ctx.grid[0].length
   const height = ctx.grid.length
   const x = 3 + Math.floor(width / 4 - text.length / 2)
   const y = Math.floor(height / 2)
 
-  // Clear the area where the text will be displayed
   for (let i = 0; i < text.length; i++) {
     process.stdout.write(moveTo(x + i, y))
     process.stdout.write(' ')

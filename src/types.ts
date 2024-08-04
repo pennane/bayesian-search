@@ -2,12 +2,17 @@ export type Cell = {
   probability: number
   probabilityToFind: number
   visitations: number
+  isGoal: boolean
 }
 
-export type Vec = {
+export type Vector = {
   x: number
   y: number
 }
+
+export type SearchCell = Cell & Vector
+
+export type Grid = SearchCell[][]
 
 // https://nodejs.org/docs/latest/api/util.html#background-colors
 export type BackgroundColor =

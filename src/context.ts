@@ -1,155 +1,143 @@
 import {
-  ADJACENT_DELTAS,
   INITIAL_EXPECTATION_RANGE_DIVIDER,
   INITIAL_EXPECTATION_WEIGHT,
   PROBABILITY_TO_FIND,
   SIZE
 } from './const'
-import { Cell, Vec } from './types'
-import { pointEquals } from './util'
-
-type ContextParams = {
-  rows: Cell[][]
-  actual: Vec
-  startingPosition: Vec
-}
-
-export class Context {
-  grid: (Cell & Vec)[][]
-  actualGoal: Cell & Vec
-  currentPosition: Vec
-
-  constructor({ rows, actual, startingPosition }: ContextParams) {
-    this.grid = rows.map((row, y) => row.map((cell, x) => ({ ...cell, x, y })))
-    this.actualGoal = this.at(actual)
-    this.currentPosition = startingPosition
+import { Cell, SearchCell, Vector } from './types'
+import Grid from './grid'
+import Vec from './vec'
+namespace Context {
+  export type ContextParams = {
+    rows: Cell[][]
+    startingPosition: Vector
   }
 
-  at<T extends { x: number; y: number }>(point: T) {
-    return this.grid[point.y][point.x]
-  }
+  export class BayesianSearch {
+    grid: SearchCell[][]
+    position: Vector
+    #best: SearchCell
 
-  check(point: Vec): boolean {
-    const cell = this.at(point)
-    const isGoal = pointEquals(this.actualGoal, cell)
-
-    if (isGoal && Math.random() < cell.probabilityToFind) {
-      return true
+    constructor({ rows, startingPosition }: ContextParams) {
+      this.grid = rows.map((row, y) =>
+        row.map((cell, x) => ({ ...cell, x, y }))
+      )
+      this.position = startingPosition
+      this.#best = Grid.findBest(this.grid)
     }
 
-    cell.visitations += 1
+    get best() {
+      if (Vec.equals(this.#best, this.position)) {
+        this.#best = Grid.findBest(this.grid)
+      }
+      return this.#best
+    }
 
-    // Calculate the new total probability with the adjusted probability only for the checked cell
-    const newTotalProbability = this.grid.reduce((sum, row) => {
-      return (
-        sum +
-        row.reduce((rowSum, c) => {
-          let adjustedProbability = c.probability
-          if (c.x === point.x && c.y === point.y) {
-            adjustedProbability *= Math.pow(
-              1 - c.probabilityToFind,
-              c.visitations
-            )
-          }
-          return rowSum + adjustedProbability
-        }, 0)
-      )
-    }, 0)
+    check(point: Vector): boolean {
+      const cell = Grid.at(this.grid, point)
 
-    // Update the probabilities of each cell
-    this.grid.forEach((row) => {
-      row.forEach((c) => {
-        let adjustedProbability = c.probability
-        if (c.x === point.x && c.y === point.y) {
+      if (cell.isGoal && Math.random() < cell.probabilityToFind) {
+        return true
+      }
+
+      cell.visitations += 1
+
+      const newTotalProbability = this.grid.reduce((sum, row) => {
+        return (
+          sum +
+          row.reduce((rowSum, c) => {
+            let adjustedProbability = c.probability
+            if (c.x === point.x && c.y === point.y) {
+              adjustedProbability *= Math.pow(
+                1 - c.probabilityToFind,
+                c.visitations
+              )
+            }
+            return rowSum + adjustedProbability
+          }, 0)
+        )
+      }, 0)
+
+      for (const cell of this.grid.flat()) {
+        let adjustedProbability = cell.probability
+
+        if (cell.x === point.x && cell.y === point.y) {
           adjustedProbability *= Math.pow(
-            1 - c.probabilityToFind,
-            c.visitations
+            1 - cell.probabilityToFind,
+            cell.visitations
           )
-          c.probability =
-            (adjustedProbability * (1 - c.probabilityToFind)) /
+          cell.probability =
+            (adjustedProbability * (1 - cell.probabilityToFind)) /
             newTotalProbability
         } else {
-          c.probability = adjustedProbability / newTotalProbability
+          cell.probability = adjustedProbability / newTotalProbability
         }
-      })
-    })
+      }
 
-    return false
+      return false
+    }
   }
 
-  adjacents(point: Vec) {
-    const adjacents: (Cell & Vec)[] = []
+  export function createInitial(size: Vector): BayesianSearch {
+    const rows = size.x
+    const cols = size.y
 
-    for (const dir of ADJACENT_DELTAS) {
-      const newX = point.x + dir.x
-      const newY = point.y + dir.y
+    const startingPosition = {
+      y: Math.floor(Math.random() * rows),
+      x: Math.floor(Math.random() * cols)
+    }
 
-      if (
-        newX >= 0 &&
-        newX < this.grid[0].length &&
-        newY >= 0 &&
-        newY < this.grid.length
-      ) {
-        adjacents.push(this.at({ x: newX, y: newY }))
+    const actual = {
+      x: Math.floor(Math.random() * rows),
+      y: Math.floor(Math.random() * cols)
+    }
+
+    const expectationRange = Math.round(
+      SIZE / INITIAL_EXPECTATION_RANGE_DIVIDER
+    )
+
+    const expectedActual = {
+      x: Math.floor(
+        actual.x + (expectationRange * Math.random() - 0.5 * expectationRange)
+      ),
+      y: Math.floor(
+        actual.y + (expectationRange * Math.random() - 0.5 * expectationRange)
+      )
+    }
+
+    const grid: Cell[][] = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => ({
+        probability: 0,
+        visitations: 0,
+        probabilityToFind: PROBABILITY_TO_FIND,
+        isGoal: false
+      }))
+    )
+
+    let totalProbability = 0
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const distance =
+          Math.abs(y - expectedActual.y) + Math.abs(x - expectedActual.x)
+
+        const probability =
+          1_000_000 / Math.exp(INITIAL_EXPECTATION_WEIGHT * (distance + 1))
+
+        grid[y][x].probability = probability
+        totalProbability += probability
+      }
+    }
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        grid[y][x].probability /= totalProbability
       }
     }
 
-    return adjacents
+    grid[actual.y][actual.x].isGoal = true
+
+    return new BayesianSearch({ rows: grid, startingPosition })
   }
 }
 
-export function createInitialContext(size: Vec): Context {
-  const rows = size.x
-  const cols = size.y
-
-  const startingPosition = {
-    y: Math.floor(Math.random() * rows),
-    x: Math.floor(Math.random() * cols)
-  }
-
-  const actual = {
-    x: Math.floor(Math.random() * SIZE),
-    y: Math.floor(Math.random() * SIZE)
-  }
-
-  const expectationRange = Math.round(SIZE / INITIAL_EXPECTATION_RANGE_DIVIDER)
-
-  const expectedActual = {
-    x: Math.floor(
-      actual.x + (expectationRange * Math.random() - 0.5 * expectationRange)
-    ),
-    y: Math.floor(
-      actual.y + (expectationRange * Math.random() - 0.5 * expectationRange)
-    )
-  }
-
-  const grid: Cell[][] = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => ({
-      probability: 0, // We'll set probabilities in the next step
-      visitations: 0,
-      probabilityToFind: PROBABILITY_TO_FIND
-    }))
-  )
-
-  let totalProbability = 0
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      const distance =
-        Math.abs(i - expectedActual.y) + Math.abs(j - expectedActual.x)
-
-      const probability =
-        1_000_000 / Math.exp(INITIAL_EXPECTATION_WEIGHT * (distance + 1))
-
-      grid[i][j].probability = probability
-      totalProbability += probability
-    }
-  }
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      grid[i][j].probability /= totalProbability
-    }
-  }
-
-  return new Context({ rows: grid, actual, startingPosition })
-}
+export default Context
