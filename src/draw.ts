@@ -18,10 +18,9 @@ export function showCursor(): string {
 }
 
 export function draw(ctx: Context) {
-  process.stdout.write(moveTo(0, 0))
   process.stdout.write(hideCursor())
 
-  process.stdout.write(moveTo(1, 0))
+  process.stdout.write(moveTo(2, 0))
   for (const [x] of ctx.grid[0].entries()) {
     process.stdout.write(`${x}`.padEnd(2, ' '))
   }
