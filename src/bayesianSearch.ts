@@ -7,13 +7,13 @@ import {
 import { Cell, SearchCell, Vector } from './types'
 import Grid from './grid'
 import Vec from './vec'
-namespace Context {
+namespace BayesianSearch {
   export type ContextParams = {
     rows: Cell[][]
     startingPosition: Vector
   }
 
-  export class BayesianSearch {
+  export class Context {
     grid: SearchCell[][]
     position: Vector
     #best: SearchCell
@@ -78,7 +78,7 @@ namespace Context {
     }
   }
 
-  export function createInitial(size: Vector): BayesianSearch {
+  export function createInitial(size: Vector): Context {
     const rows = size.x
     const cols = size.y
 
@@ -136,8 +136,8 @@ namespace Context {
 
     grid[actual.y][actual.x].isGoal = true
 
-    return new BayesianSearch({ rows: grid, startingPosition })
+    return new Context({ rows: grid, startingPosition })
   }
 }
 
-export default Context
+export default BayesianSearch

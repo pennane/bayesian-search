@@ -1,7 +1,7 @@
 import { styleText } from 'node:util'
 import Grid from './grid'
 import Vec from './vec'
-import Context from './context'
+import BayesianSearch from './bayesianSearch'
 import { probabilityColor, PROBABILITY_CEIL_COLORS } from './util'
 
 function moveTo(x: number, y: number): string {
@@ -16,7 +16,7 @@ export function showCursor(): string {
   return '\x1b[?25h'
 }
 
-export function draw(ctx: Context.BayesianSearch) {
+export function draw(ctx: BayesianSearch.Context) {
   process.stdout.write(hideCursor())
 
   process.stdout.write(moveTo(2, 0))
@@ -59,7 +59,7 @@ export function draw(ctx: Context.BayesianSearch) {
   process.stdout.write(hideCursor())
 }
 
-export function drawFound(ctx: Context.BayesianSearch) {
+export function drawFound(ctx: BayesianSearch.Context) {
   const text = styleText(['redBright', 'bgBlack'], 'Found it!')
   const width = ctx.grid[0].length
   const height = ctx.grid.length

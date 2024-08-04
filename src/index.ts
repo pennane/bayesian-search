@@ -1,7 +1,7 @@
 import { FRAME_MS, SIZE } from './const'
 import { draw, drawFound } from './draw'
 import { exitHandler, wait } from './util'
-import Context from './context'
+import BayesianSearch from './bayesianSearch'
 import Vec from './vec'
 import Grid from './grid'
 
@@ -11,7 +11,7 @@ process.on('SIGINT', exitHandler.bind(null, { exit: true }))
 async function start() {
   console.clear()
 
-  let ctx = Context.createInitial({ x: SIZE, y: SIZE })
+  let ctx = BayesianSearch.createInitial({ x: SIZE, y: SIZE })
 
   while (true) {
     draw(ctx)
@@ -21,7 +21,7 @@ async function start() {
     if (found) {
       drawFound(ctx)
       await wait(500)
-      ctx = Context.createInitial({ x: SIZE, y: SIZE })
+      ctx = BayesianSearch.createInitial({ x: SIZE, y: SIZE })
       continue
     }
 
