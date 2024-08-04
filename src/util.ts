@@ -1,3 +1,4 @@
+import { showCursor } from './draw'
 import type { Vec, TextSetting } from './types'
 
 export async function wait(ms: number) {
@@ -46,4 +47,13 @@ export function probabilityColor(p: number) {
   }
 
   return PROBABILITY_CEIL_COLORS.at(-1)![1]
+}
+
+export function exitHandler(
+  options: { cleanup?: boolean; exit?: boolean },
+  exitCode: number
+) {
+  if (options.cleanup) process.stdout.write(showCursor())
+  if (exitCode != null) console.log(exitCode)
+  if (options.exit) process.exit()
 }

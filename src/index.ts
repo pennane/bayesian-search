@@ -1,7 +1,10 @@
 import { createInitialContext } from './context'
 import { FRAME_MS, SIZE } from './const'
 import { draw, drawFound } from './draw'
-import { pointEquals, wait, nextPoint } from './util'
+import { pointEquals, wait, nextPoint, exitHandler } from './util'
+
+process.on('exit', exitHandler.bind(null, { cleanup: true }))
+process.on('SIGINT', exitHandler.bind(null, { exit: true }))
 
 async function start() {
   let ctx = createInitialContext({ x: SIZE, y: SIZE })

@@ -13,6 +13,10 @@ function hideCursor(): string {
   return '\x1b[?25l'
 }
 
+export function showCursor(): string {
+  return '\x1b[?25h'
+}
+
 export function draw(ctx: Context) {
   process.stdout.write(moveTo(0, 0))
   process.stdout.write(hideCursor())
@@ -35,7 +39,7 @@ export function draw(ctx: Context) {
               ? ['bgMagenta' as const]
               : pointEquals({ x, y }, ctx.currentPosition)
               ? ['bgWhite' as const]
-              : ['bgBlack' as const])
+              : [])
           ],
           Math.trunc(cell.probability * 100)
             .toString()
