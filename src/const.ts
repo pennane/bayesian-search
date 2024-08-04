@@ -17,7 +17,7 @@ export const GRID_SIZE = 24
 /**
  * The probability of finding the goal when checking a cell that contains the goal.
  */
-export const GOAL_FIND_PROBABILITY = 0.6
+export const GOAL_FIND_PROBABILITY = 0.65
 
 /**
  * Determines the initial expectation range relative to the actual goal.
@@ -31,14 +31,14 @@ export const INITIAL_EXPECTATION_RANGE_FACTOR = 3
  * higher -> more steep (higher trust in expectation)
  * lower  -> more gradual (lower trust in expectatin)
  */
-export const INITIAL_PROBABILITY_DISTRIBITION_K = 2
+export const INITIAL_PROBABILITY_DISTRIBITION_K = 0.9
 
 /**
  * The midpoint of the distribution
  * higher  -> cutoff happens slower (more vague expectation)
  * smaller -> cutoff happens faster (more exact expectation)
  */
-export const INITIAL_PROBABILITY_DISTRIBUTION_X0 = 4
+export const INITIAL_PROBABILITY_DISTRIBUTION_X0 = 5
 
 /**
  * The number of milliseconds waited between each move in the context.
